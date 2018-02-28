@@ -12,6 +12,13 @@ const Https = Http + "s"
 const ProtocolMatch = Https + "?://"
 const Host = "gardenmoto.ru"
 
+
+type Knot struct {
+	Url string
+	Count int
+	Child []Knot
+}
+
 func getUrlLinks(url string) (correct []string){
 	resp, _ := http.Get(url)
 	defer resp.Body.Close()
@@ -23,13 +30,19 @@ func getUrlLinks(url string) (correct []string){
 			if !regexp.MustCompile(ProtocolMatch + Host).MatchString(link) {
 				continue
 			}
+			link = regexp.MustCompile(Https+"?://"+Host).ReplaceAllString(link, "")
 		}
-		correct = append(correct, regexp.MustCompile("(href=|\")").ReplaceAllString(link, ""))
+		link = regexp.MustCompile("(href=|\")").ReplaceAllString(link, "")
+		if regexp.MustCompile("\\.(css|js|ico)").MatchString(link) {
+			continue
+		}
+		correct = append(correct, link)
 	}
 	return
 }
 
 func main() {
 
-	fmt.Println(getUrlLinks(Https + "://" + Host))
+	getUrlLinks(Https + "://" + Host)
+
 }
