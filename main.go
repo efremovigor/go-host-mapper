@@ -30,9 +30,8 @@ func getUrlLinks(url string) (correct []string){
 			if !regexp.MustCompile(ProtocolMatch + Host).MatchString(link) {
 				continue
 			}
-			link = regexp.MustCompile(Https+"?://"+Host).ReplaceAllString(link, "")
 		}
-		link = regexp.MustCompile("(href=|\")").ReplaceAllString(link, "")
+		link = regexp.MustCompile("("+Https+"?://"+Host+"|href=|\")").ReplaceAllString(link, "")
 		if regexp.MustCompile("\\.(css|js|ico)").MatchString(link) {
 			continue
 		}
@@ -43,6 +42,6 @@ func getUrlLinks(url string) (correct []string){
 
 func main() {
 
-	getUrlLinks(Https + "://" + Host)
+	fmt.Println(getUrlLinks(Https + "://" + Host))
 
 }
