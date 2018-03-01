@@ -72,25 +72,18 @@ func getUrlLinks(url string) (correct []string) {
 	return
 }
 
-func main() {
-	for _, url := range getUrlLinks(Https + "://" + Host) {
-		state := list.search(url)
+func stepInitListKnot(parent *Knot, url string){
+	for _, url := range getUrlLinks(Https + "://" + Host + url) {
+		state := parent.search(url)
 		if state == false {
-			list.addKnot(Knot{url, 0, []Knot{}})
-			for _, url := range getUrlLinks(Https + "://" + Host + url) {
-				state := list.search(url)
-				if state == false {
-					list.Child[len(list.Child)-1].addKnot(Knot{url, 0, []Knot{}})
-					for _, url := range getUrlLinks(Https + "://" + Host + url) {
-						state := list.search(url)
-						if state == false {
-							list.Child[len(list.Child)-1].Child[len(list.Child[len(list.Child)-1].Child)-1].addKnot(Knot{url, 0, []Knot{}})
-						}
-					}
-				}
-			}
+			parent.addKnot(Knot{url, 0, []Knot{}})
+			stepInitListKnot(&list.Child[len(list.Child)-1], url)
 		}
 	}
+}
+
+func main() {
+	stepInitListKnot(list,"")
 	fmt.Println(list)
 
 }
