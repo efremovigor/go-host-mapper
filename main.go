@@ -19,6 +19,26 @@ type Knot struct {
 	Child []Knot
 }
 
+func search(Knot *Knot,url string) bool{
+	if Knot.Url == url{
+		Knot.Count++
+		return true
+	}
+	for _ , child := range Knot.Child{
+		if child.Url == url{
+			child.Count++
+			return true
+		}
+		state := search(&child,url)
+		if state == true {
+			return true
+		}
+	}
+	return false
+}
+
+var list  = Knot{"/",0,[]Knot{}}
+
 func getUrlLinks(url string) (correct []string){
 	resp, _ := http.Get(url)
 	defer resp.Body.Close()
@@ -41,7 +61,18 @@ func getUrlLinks(url string) (correct []string){
 }
 
 func main() {
-
-	fmt.Println(getUrlLinks(Https + "://" + Host))
+	for _ , url := range getUrlLinks(Https + "://" + Host){
+		state := search(&list,url)
+		if state == false {
+			list.Child = append(list.Child,Knot{url,0,[]Knot{}})
+			for _ , url := range getUrlLinks(Https + "://" + Host+  url){
+				state := search(&list,url)
+				if state == false {
+					list.Child = append(list.Child,Knot{url,0,[]Knot{}})
+				}
+			}
+		}
+	}
+	fmt.Println(list)
 
 }
