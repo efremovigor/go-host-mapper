@@ -20,23 +20,23 @@ func addBadUrl(url string) {
     badUrl = append(badUrl, url)
 }
 
-type Knot struct {
+type Unit struct {
     Url   string `json:"url"`
     Count int    `json:"count"`
-    Child []Knot `json:"child"`
+    Child []Unit `json:"child"`
 }
 
 var list = createKnot("/")
 
-func createKnot(url string) *Knot {
-    return &Knot{url, 0, []Knot{}}
+func createKnot(url string) *Unit {
+    return &Unit{url, 0, []Unit{}}
 }
 
-func (parent *Knot) addCountKnot() {
+func (parent *Unit) addCountKnot() {
     parent.Count++
 }
 
-func (parent *Knot) search(url string) bool {
+func (parent *Unit) search(url string) bool {
     if parent.Url == url {
         parent.addCountKnot()
         return true
@@ -55,7 +55,7 @@ func (parent *Knot) search(url string) bool {
     return false
 }
 
-func (parent *Knot) addKnot(child Knot) {
+func (parent *Unit) addKnot(child Unit) {
     parent.Child = append(parent.Child, child)
 }
 
@@ -89,7 +89,7 @@ func getUrlLinks(url string) (correct []string, err error) {
     return
 }
 
-func stepInitListKnot(parent *Knot, url string) {
+func stepInitListKnot(parent *Unit, url string) {
     urlList, err := getUrlLinks(Https + "://" + Host + url)
     if err != nil {
         fmt.Println(err.Error())
@@ -97,7 +97,7 @@ func stepInitListKnot(parent *Knot, url string) {
         for _, url := range urlList {
             state := parent.search(url)
             if state == false {
-                parent.addKnot(Knot{url, 0, []Knot{}})
+                parent.addKnot(Unit{url, 0, []Unit{}})
                 stepInitListKnot(&list.Child[len(list.Child)-1], url)
             }
         }
