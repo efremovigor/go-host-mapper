@@ -26,24 +26,24 @@ type Unit struct {
     Child []Unit `json:"child"`
 }
 
-var list = createKnot("/")
+var list = createUnit("/")
 
-func createKnot(url string) *Unit {
+func createUnit(url string) *Unit {
     return &Unit{url, 0, []Unit{}}
 }
 
-func (parent *Unit) addCountKnot() {
+func (parent *Unit) addCountUnit() {
     parent.Count++
 }
 
 func (parent *Unit) search(url string) bool {
     if parent.Url == url {
-        parent.addCountKnot()
+        parent.addCountUnit()
         return true
     }
     for key, child := range parent.Child {
         if child.Url == url {
-            child.addCountKnot()
+            child.addCountUnit()
             parent.Child[key] = child
             return true
         }
@@ -55,7 +55,7 @@ func (parent *Unit) search(url string) bool {
     return false
 }
 
-func (parent *Unit) addKnot(child Unit) {
+func (parent *Unit) addUnit(child Unit) {
     parent.Child = append(parent.Child, child)
 }
 
@@ -89,7 +89,7 @@ func getUrlLinks(url string) (correct []string, err error) {
     return
 }
 
-func stepInitListKnot(parent *Unit, url string) {
+func stepInitListUnit(parent *Unit, url string) {
     urlList, err := getUrlLinks(Https + "://" + Host + url)
     if err != nil {
         fmt.Println(err.Error())
@@ -97,8 +97,8 @@ func stepInitListKnot(parent *Unit, url string) {
         for _, url := range urlList {
             state := parent.search(url)
             if state == false {
-                parent.addKnot(Unit{url, 0, []Unit{}})
-                stepInitListKnot(&list.Child[len(list.Child)-1], url)
+                parent.addUnit(Unit{url, 0, []Unit{}})
+                stepInitListUnit(&list.Child[len(list.Child)-1], url)
             }
         }
     }
@@ -106,7 +106,7 @@ func stepInitListKnot(parent *Unit, url string) {
 }
 
 func main() {
-    stepInitListKnot(list, "")
+    stepInitListUnit(list, "")
     data , _ := json.Marshal(list)
     fmt.Println(string(data))
 
